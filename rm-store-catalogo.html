@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RM Store — Catálogo</title>
+
+<!-- ============================================================
+     TAILWIND CSS (via CDN) + configuração de tema personalizado
+     ============================================================ -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class', // dark mode controlado via classe .dark na <html>
+    theme: {
+      extend: {
+        colors: {
+          bone:      '#F3F1EA', // fundo — modo claro
+          graphite:  '#141413', // fundo — modo escuro
+          ink:       '#1B1A17', // texto principal — modo claro
+          paper:     '#ECEAE2', // texto principal — modo escuro
+          stone:     '#8C887C', // texto secundário / legendas
+          line: {
+            light: '#DAD7CB',   // bordas — modo claro
+            dark:  '#2A2926',   // bordas — modo escuro
+          },
+          accent: {
+            DEFAULT: '#2E3A63', // tinta de carimbo — modo claro
+            dark:    '#93A6DC', // mesma tinta, ajustada para contraste no escuro
+          },
+        },
+        fontFamily: {
+          display: ['Fraunces', 'ui-serif', 'serif'],
+          body:    ['"Work Sans"', 'ui-sans-serif', 'sans-serif'],
+          mono:    ['"Space Mono"', 'ui-monospace', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
+
+<!-- Google Fonts: serifada editorial + humanista + monoespaçada utilitária -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ==========================================================
+     Estilos utilitários que o Tailwind (via CDN) não cobre bem
+     ========================================================== */
+
+  /* Linha de "perfuração" — remete à etiqueta de caixa de tênis */
+  .perforation {
+    border-top: 1px dashed var(--line-color, #DAD7CB);
+  }
+  .dark .perforation { --line-color: #2A2926; }
+
+  /* Padrão de "código de barras" decorativo, 100% CSS */
+  .barcode {
+    height: 22px;
+    background-image: repeating-linear-gradient(
+      90deg,
+      currentColor 0px, currentColor 1px,
+      transparent 1px, transparent 3px,
+      currentColor 3px, currentColor 4px,
+      transparent 4px, transparent 7px
+    );
+    opacity: 0.35;
+  }
+
+  /* Transição suave entre telas */
+  .view-fade { animation: fadeIn .4s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .view-fade { animation: none; }
+  }
+
+  /* Foco visível acessível, com a cor de acento da marca */
+  :focus-visible {
+    outline: 2px solid #2E3A63;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .dark :focus-visible { outline-color: #93A6DC; }
+
+  /* Scrollbar discreta (progressive enhancement, não é crítico) */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #DAD7CB; border-radius: 999px; }
+  .dark ::-webkit-scrollbar-thumb { background: #2A2926; }
+</style>
+</head>
+
+<body class="bg-bone text-ink dark:bg-graphite dark:text-paper font-body antialiased transition-colors duration-300">
+
+  <!-- ============================================================
+       CABEÇALHO
+       ============================================================ -->
+  <header class="sticky top-0 z-40 border-b border-line-light dark:border-line-dark bg-bone/90 dark:bg-graphite/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+
+      <!-- Logotipo da loja: clicar sempre volta para a home -->
+      <button id="btn-logo" class="flex items-center gap-3 group" aria-label="Voltar para a página inicial">
+        <span class="w-9 h-9 border border-ink dark:border-paper flex items-center justify-center font-mono text-xs font-bold tracking-tight rounded-sm group-hover:bg-ink group-hover:text-bone dark:group-hover:bg-paper dark:group-hover:text-graphite transition-colors">
+          RM
+        </span>
+        <span class="font-display italic text-lg tracking-tight">RM Store</span>
+      </button>
+
+      <!-- Alternância de modo claro/escuro -->
+      <button id="btn-theme-toggle" aria-label="Alternar modo escuro" class="w-10 h-10 flex items-center justify-center border border-line-light dark:border-line-dark rounded-full hover:border-ink dark:hover:border-paper transition-colors">
+        <!-- Ícone de sol: aparece no modo escuro (ação = ir para o claro) -->
+        <svg class="hidden dark:block w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>
+        </svg>
+        <!-- Ícone de lua: aparece no modo claro (ação = ir para o escuro) -->
+        <svg class="block dark:hidden w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Contêiner principal onde as telas são renderizadas via JS -->
+  <main id="app" class="max-w-6xl mx-auto px-5 sm:px-8 py-8 sm:py-12 min-h-[70vh]"></main>
+
+  <!-- ============================================================
+       RODAPÉ
+       ============================================================ -->
+  <footer class="border-t border-line-light dark:border-line-dark mt-16">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-6 text-xs font-mono text-stone tracking-wide">
+      RM STORE — CATÁLOGO DE TRIAGEM PARA ATENDIMENTO
+    </div>
+  </footer>
+
+
+<script>
+/* =====================================================================
+   RM STORE — CATÁLOGO DE TÊNIS
+   ---------------------------------------------------------------------
+   Aplicação de página única (SPA) em JavaScript puro.
+   Fluxo: Home (marcas) -> Marca (modelos) -> Produto (detalhe + WhatsApp)
+   ===================================================================== */
+
+
+/* =====================================================================
+   1) CONFIGURAÇÃO DA LOJA
+   ===================================================================== */
+
+// Número de WhatsApp Business no formato internacional, somente dígitos:
+// código do país + DDD + número. Troque pelo número real da loja.
+const WHATSAPP_NUMBER = '5548996374837';
+
+
+/* =====================================================================
+   2) BASE DE DADOS (MOCK) — SUAS 9 MARCAS, NA ORDEM DEFINIDA
+   ---------------------------------------------------------------------
+   COMO PREENCHER COM SUAS IMAGENS (logos e fotos vindas do GitHub):
+
+     1. Suba os arquivos para um repositório no GitHub (pode ser público
+        ou um repositório de assets dedicado).
+     2. Pegue o link no formato RAW, algo como:
+        https://raw.githubusercontent.com/SEU-USUARIO/SEU-REPOSITORIO/main/logos/nike.png
+        (não use o link normal "github.com/.../blob/...", tem que ser o RAW)
+     3. Cole esse link diretamente no campo `logoUrl` da marca ou dentro
+        do array `images` do modelo — é só isso, nada mais precisa mudar.
+
+   DICA SOBRE AS LOGOS: use um arquivo PNG com fundo transparente e o
+   desenho da logo em preto/traço escuro. O próprio site já aplica um
+   filtro automático que deixa a logo branca no modo escuro — você não
+   precisa preparar duas versões do arquivo.
+
+   ESTRUTURA PADRÃO — siga exatamente este formato ao editar/adicionar:
+
+   Marca (cada chave dentro de DATABASE):
+     name      -> Nome de exibição da marca (string)
+     slug      -> Identificador único e fixo da marca, sem espaços/acentos
+                  (usado internamente para navegação — não duplique)
+     logoUrl   -> Link RAW da logo oficial da marca (string). Deixe ''
+                  (vazio) até ter a imagem: a tela mostra apenas um texto
+                  discreto com o nome da marca, sem tentar carregar nada.
+
+   Modelo (cada item do array "models"):
+     id      -> Identificador único do modelo, sem espaços (uso interno)
+     name    -> Nome do modelo (string)
+     price   -> Preço em reais, apenas número, sem símbolos (ex: 899)
+     images  -> Array com o link de cada foto do produto, uma por ângulo,
+                ex: ['https://raw.githubusercontent.com/.../frente.jpg',
+                     'https://raw.githubusercontent.com/.../lado.jpg',
+                     'https://raw.githubusercontent.com/.../sola.jpg']
+                Deixe [] (vazio) até ter as fotos: a tela mostra
+                automaticamente "[Insira a foto do tênis aqui]".
+                Com 2+ fotos, as miniaturas aparecem automaticamente
+                abaixo da foto principal, e o cliente pode clicar para
+                trocar o ângulo.
+     colors  -> Array de strings com as cores disponíveis
+     sizes   -> Array de números com os tamanhos disponíveis
+
+   Observação: os modelos abaixo são EXEMPLOS ILUSTRATIVOS para você
+   visualizar o funcionamento — troque nomes, preços, cores e tamanhos
+   pelos produtos reais da sua loja quando quiser.
+   ===================================================================== */
+
+const DATABASE = {
+
+  // 1 — Nike / Air Jordan ------------------------------------------------
+  'nike-jordan': {
+    name: 'Nike / Air Jordan',
+    slug: 'nike-jordan',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/refs/heads/main/logo-nike.svg', // <- cole aqui o link RAW da logo (Nike / Jordan)
+    models: [
+      {
+        id: 'air-force-1-07',
+        name: "Air Force 1 '07",
+        price: 799,
+        images: [], // <- cole aqui os links das fotos deste modelo
+        colors: ['Branco', 'Preto', 'Branco/Bege'],
+        sizes: [36, 37, 38, 39, 40, 41, 42, 43],
+      },
+      {
+        id: 'dunk-low-panda',
+        name: 'Dunk Low Panda',
+        price: 849,
+        images: [],
+        colors: ['Branco/Preto', 'Preto/Branco'],
+        sizes: [36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'air-jordan-1-retro-high-og',
+        name: 'Air Jordan 1 Retro High OG',
+        price: 1099,
+        images: [],
+        colors: ['Chicago', 'Preto/Vermelho', 'Preto/Branco'],
+        sizes: [38, 39, 40, 41, 42, 43, 44],
+      },
+    ],
+  },
+
+  // 2 — Adidas -------------------------------------------------------------
+  adidas: {
+    name: 'Adidas',
+    slug: 'adidas',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/refs/heads/main/logo-adidas.svg', // <- cole aqui o link RAW da logo da Adidas
+    models: [
+      {
+        id: 'samba-og',
+        name: 'Samba OG',
+        price: 749,
+        images: [],
+        colors: ['Branco/Preto/Dourado', 'Preto/Branco'],
+        sizes: [36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'gazelle',
+        name: 'Gazelle',
+        price: 699,
+        images: [],
+        colors: ['Verde/Branco', 'Vermelho/Branco', 'Azul/Branco'],
+        sizes: [36, 37, 38, 39, 40, 41],
+      },
+      {
+        id: 'ultraboost-22',
+        name: 'Ultraboost 22',
+        price: 1049,
+        images: [],
+        colors: ['Preto Total', 'Branco/Cinza'],
+        sizes: [38, 39, 40, 41, 42, 43, 44],
+      },
+    ],
+  },
+
+  // 3 — New Balance ---------------------------------------------------------
+  'new-balance': {
+    name: 'New Balance',
+    slug: 'new-balance',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/main/logo-new-balance.png', // <- cole aqui o link RAW da logo da New Balance
+    models: [
+      {
+        id: 'nb-550',
+        name: '550',
+        price: 799,
+        images: [],
+        colors: ['Branco/Verde', 'Branco/Cinza'],
+        sizes: [37, 38, 39, 40, 41, 42, 43],
+      },
+      {
+        id: 'nb-2002r',
+        name: '2002R',
+        price: 999,
+        images: [],
+        colors: ['Cinza Protection Pack', 'Bege/Marrom'],
+        sizes: [38, 39, 40, 41, 42, 43],
+      },
+      {
+        id: 'nb-990v6',
+        name: '990v6',
+        price: 1299,
+        images: [],
+        colors: ['Cinza', 'Preto'],
+        sizes: [39, 40, 41, 42, 43, 44],
+      },
+    ],
+  },
+
+  // 4 — Vans ------------------------------------------------------------
+  vans: {
+    name: 'Vans',
+    slug: 'vans',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/main/logo-vans.png', // <- cole aqui o link RAW da logo da Vans
+    models: [
+      {
+        id: 'old-skool',
+        name: 'Old Skool',
+        price: 449,
+        images: [],
+        colors: ['Preto/Branco', 'Azul Marinho/Branco'],
+        sizes: [35, 36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'sk8-hi',
+        name: 'SK8-Hi',
+        price: 499,
+        images: [],
+        colors: ['Preto/Branco', 'Xadrez'],
+        sizes: [36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'authentic',
+        name: 'Authentic',
+        price: 399,
+        images: [],
+        colors: ['Preto', 'Branco', 'Vermelho'],
+        sizes: [35, 36, 37, 38, 39, 40, 41],
+      },
+    ],
+  },
+
+  // 5 — Veja / Vert ------------------------------------------------------
+  'veja-vert': {
+    name: 'Veja / Vert',
+    slug: 'veja-vert',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/main/logo-vert-transparente.png', // <- cole aqui o link RAW da logo (Veja / Vert)
+    models: [
+      {
+        id: 'veja-campo',
+        name: 'Campo',
+        price: 899,
+        images: [],
+        colors: ['Branco', 'Branco/Verde Alga'],
+        sizes: [36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'veja-esplar',
+        name: 'Esplar',
+        price: 799,
+        images: [],
+        colors: ['Branco/Preto', 'Branco/Bege'],
+        sizes: [35, 36, 37, 38, 39, 40, 41],
+      },
+      {
+        id: 'veja-v10',
+        name: 'V-10',
+        price: 849,
+        images: [],
+        colors: ['Branco', 'Preto'],
+        sizes: [36, 37, 38, 39, 40, 41, 42, 43],
+      },
+    ],
+  },
+
+  // 6 — Puma ------------------------------------------------------------
+  puma: {
+    name: 'Puma',
+    slug: 'puma',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/refs/heads/main/logo-puma.svg', // <- cole aqui o link RAW da logo da Puma
+    models: [
+      {
+        id: 'suede-classic',
+        name: 'Suede Classic',
+        price: 489,
+        images: [],
+        colors: ['Vermelho', 'Preto', 'Azul Marinho'],
+        sizes: [36, 37, 38, 39, 40, 41],
+      },
+      {
+        id: 'rs-x',
+        name: 'RS-X',
+        price: 649,
+        images: [],
+        colors: ['Branco/Multicolor', 'Preto/Cinza'],
+        sizes: [37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'cali-sport',
+        name: 'Cali Sport',
+        price: 559,
+        images: [],
+        colors: ['Branco/Rosa', 'Branco/Preto'],
+        sizes: [35, 36, 37, 38, 39, 40],
+      },
+    ],
+  },
+
+  // 7 — On Running -----------------------------------------------------
+  'on-running': {
+    name: 'On Running',
+    slug: 'on-running',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/refs/heads/main/logo-on-running.png', // <- cole aqui o link RAW da logo da On Running
+    models: [
+      {
+        id: 'cloudmonster',
+        name: 'Cloudmonster',
+        price: 1199,
+        images: [],
+        colors: ['Preto/Branco', 'Azul/Amarelo'],
+        sizes: [38, 39, 40, 41, 42, 43, 44],
+      },
+      {
+        id: 'cloud-5',
+        name: 'Cloud 5',
+        price: 899,
+        images: [],
+        colors: ['Branco/Gelo', 'Preto/Asfalto'],
+        sizes: [36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'cloudswift',
+        name: 'Cloudswift',
+        price: 999,
+        images: [],
+        colors: ['Preto', 'Cinza/Verde'],
+        sizes: [37, 38, 39, 40, 41, 42, 43],
+      },
+    ],
+  },
+
+  // 8 — Mizuno ------------------------------------------------------------
+  mizuno: {
+    name: 'Mizuno',
+    slug: 'mizuno',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/refs/heads/main/logo-mizuno.png', // <- cole aqui o link RAW da logo da Mizuno
+    models: [
+      {
+        id: 'wave-rider-27',
+        name: 'Wave Rider 27',
+        price: 899,
+        images: [],
+        colors: ['Preto/Prata', 'Azul/Branco'],
+        sizes: [38, 39, 40, 41, 42, 43, 44],
+      },
+      {
+        id: 'wave-prophecy-14',
+        name: 'Wave Prophecy 14',
+        price: 1499,
+        images: [],
+        colors: ['Preto', 'Branco/Azul'],
+        sizes: [39, 40, 41, 42, 43, 44],
+      },
+      {
+        id: 'morelia-neo-iv',
+        name: 'Morelia Neo IV',
+        price: 799,
+        images: [],
+        colors: ['Preto/Dourado', 'Branco/Preto'],
+        sizes: [37, 38, 39, 40, 41, 42, 43],
+      },
+    ],
+  },
+
+  // 9 — Olympikus -------------------------------------------------------
+  olympikus: {
+    name: 'Olympikus',
+    slug: 'olympikus',
+    logoUrl: 'https://raw.githubusercontent.com/Raphafel/rm-store-imagens/refs/heads/main/logo-olympikus.png', // <- cole aqui o link RAW da logo da Olympikus
+    models: [
+      {
+        id: 'corre-4',
+        name: 'Corre 4',
+        price: 299,
+        images: [],
+        colors: ['Preto/Branco', 'Cinza/Laranja'],
+        sizes: [35, 36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'valente-2',
+        name: 'Valente 2',
+        price: 349,
+        images: [],
+        colors: ['Preto', 'Branco/Cinza'],
+        sizes: [36, 37, 38, 39, 40, 41, 42],
+      },
+      {
+        id: 'vibe',
+        name: 'Vibe',
+        price: 379,
+        images: [],
+        colors: ['Branco/Verde', 'Preto/Branco'],
+        sizes: [35, 36, 37, 38, 39, 40, 41],
+      },
+    ],
+  },
+
+};
+
+
+/* =====================================================================
+   3) ESTADO DA APLICAÇÃO
+   ===================================================================== */
+
+const state = {
+  screen: 'home',      // 'home' | 'brand' | 'product'
+  brandSlug: null,
+  productId: null,
+  selectedColor: null,
+  selectedSize: null,
+};
+
+
+/* =====================================================================
+   4) UTILITÁRIOS
+   ===================================================================== */
+
+// Formata número para Real brasileiro, ex: 899 -> "R$ 899"
+function formatBRL(value) {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
+// Monta a mensagem/link do WhatsApp com o texto pré-formatado e codificado
+function buildWhatsAppLink(productName, color, size) {
+  const text = `Olá! Tenho interesse no tênis ${productName}, cor ${color}, tamanho ${size}. Tem disponível?`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}
+
+// Ícone de seta para os botões de "Voltar"
+function chevronLeftIcon() {
+  return `
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  `;
+}
+
+// Ícone genérico de balão de mensagem para o botão de contato
+// (ícone neutro, não é a logo oficial do WhatsApp)
+function chatIcon() {
+  return `
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 11.5a8.5 8.5 0 0 1-11.9 7.8L4 21l1.7-5.1A8.5 8.5 0 1 1 21 11.5Z"/>
+    </svg>
+  `;
+}
+
+/* ---------------------------------------------------------------------
+   Sistema de imagem-com-placeholder
+   -----------------------------------------------------------------
+   Regra importante: a imagem e o texto de placeholder NUNCA ficam
+   sobrepostos ao mesmo tempo. Ou a URL existe e mostramos só a <img>
+   (com o placeholder escondido, pronto para reaparecer se o link
+   quebrar), ou a URL está vazia e mostramos só o texto — nunca os dois
+   juntos. Isso evita o texto "vazar" atrás de PNGs com fundo transparente.
+   --------------------------------------------------------------------- */
+
+// Gera o CONTEÚDO interno (placeholder OU imagem) — usado na renderização
+// inicial e para trocar a imagem principal da galeria.
+function mediaContent(url, alt, placeholderHtml, imgClasses) {
+  if (!url) {
+    // Sem link cadastrado: mostra só o texto discreto, nada de <img>.
+    return `<span class="media-placeholder flex items-center justify-center w-full h-full px-2 text-center">${placeholderHtml}</span>`;
+  }
+  // Com link cadastrado: mostra só a imagem. O placeholder fica pronto
+  // (escondido) para reaparecer automaticamente caso o link esteja quebrado
+  // — ver bindMediaFallbacks().
+  return `
+    <span class="media-placeholder hidden items-center justify-center w-full h-full px-2 text-center">${placeholderHtml}</span>
+    <img src="${url}" alt="${alt}" class="media-image ${imgClasses}" data-fallback="true">
+  `;
+}
+
+// Gera a CAIXA completa (moldura + conteúdo) — usado na renderização de cartões
+function mediaBox(url, alt, placeholderHtml, boxClasses, imgClasses) {
+  return `<div class="relative flex items-center justify-center overflow-hidden ${boxClasses}">${mediaContent(url, alt, placeholderHtml, imgClasses)}</div>`;
+}
+
+// Liga o tratamento de erro de carregamento: se uma <img data-fallback>
+// falhar ao carregar (link quebrado, arquivo removido etc.), ela se
+// esconde e o placeholder correspondente reaparece no lugar. Precisa ser
+// chamada depois de qualquer innerHTML que insira imagens novas na tela.
+function bindMediaFallbacks(root) {
+  const scope = root || document;
+  scope.querySelectorAll('img[data-fallback]').forEach(img => {
+    img.addEventListener('error', () => {
+      img.classList.add('hidden');
+      const placeholder = img.previousElementSibling;
+      if (placeholder && placeholder.classList.contains('media-placeholder')) {
+        placeholder.classList.remove('hidden');
+        placeholder.classList.add('flex');
+      }
+    }, { once: true });
+  });
+}
+
+// Placeholder de LOGO: apenas o nome da marca, discreto, sem nenhuma
+// imagem por trás — usado somente quando logoUrl está vazio.
+function logoPlaceholder(brandName) {
+  return `<span class="font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-stone">${brandName}</span>`;
+}
+
+// Placeholder de FOTO DE PRODUTO: aviso instrucional simples
+function photoPlaceholder() {
+  return `
+    <span class="font-mono text-[10px] sm:text-[11px] leading-relaxed uppercase tracking-widest text-stone">
+      [Insira a foto do tênis aqui]
+    </span>`;
+}
+
+// Classes padrão de imagem para cada contexto (mantidas centralizadas
+// para que a troca de foto na galeria use exatamente o mesmo estilo).
+//
+// IMPORTANTE — logos: "dark:brightness-0 dark:invert" é o filtro que
+// transforma qualquer PNG de traço escuro em uma versão branca
+// automaticamente quando o modo escuro está ativo. No modo claro,
+// nenhum filtro é aplicado e a logo aparece na cor original (escura).
+const IMG_LOGO_CARD     = 'w-full h-full object-contain p-3 dark:brightness-0 dark:invert transition-all duration-300';
+const IMG_LOGO_HEADER   = 'w-full h-full object-contain p-3 dark:brightness-0 dark:invert transition-all duration-300';
+const IMG_PRODUCT_CARD  = 'w-full h-full object-contain p-6';
+const IMG_GALLERY_MAIN  = 'w-full h-full object-contain p-8 sm:p-12';
+const IMG_GALLERY_THUMB = 'w-full h-full object-contain p-1.5';
+
+// Classes do "chip" que envolve toda logo: se ajusta ao tema (fundo claro
+// no modo claro, fundo neutro escuro no modo escuro) para dar contraste
+// correto à logo branca gerada pelo filtro acima.
+const LOGO_CHIP = 'bg-bone dark:bg-graphite border border-line-light dark:border-line-dark rounded-sm transition-colors duration-300';
+
+
+/* =====================================================================
+   5) RENDERIZAÇÃO — TELA INICIAL (grade de marcas)
+   ===================================================================== */
+
+function renderHome() {
+  const brands = Object.values(DATABASE); // preserva a ordem definida no DATABASE
+
+  const brandCards = brands.map(brand => `
+    <button
+      class="group text-left border border-line-light dark:border-line-dark rounded-sm p-6 sm:p-7 flex flex-col gap-5 hover:border-ink dark:hover:border-paper transition-colors"
+      data-action="open-brand" data-brand="${brand.slug}"
+    >
+      ${mediaBox(
+        brand.logoUrl,
+        `Logo ${brand.name}`,
+        logoPlaceholder(brand.name),
+        `h-16 sm:h-20 w-full ${LOGO_CHIP}`,
+        IMG_LOGO_CARD
+      )}
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-stone">${brand.name}</p>
+        <p class="font-mono text-[11px] text-stone/70 mt-1">${brand.models.length} modelos disponíveis</p>
+      </div>
+
+      <span class="inline-flex items-center gap-2 text-sm font-mono uppercase tracking-widest group-hover:gap-3 transition-all">
+        Ver modelos
+        <svg class="w-3.5 h-3.5 -rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </span>
+    </button>
+  `).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="view-fade">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-stone mb-3">Catálogo</p>
+      <h1 class="font-display text-3xl sm:text-4xl mb-8 sm:mb-10">Selecione uma marca</h1>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        ${brandCards}
+      </div>
+    </div>
+  `;
+
+  attachActionListeners();
+  bindMediaFallbacks();
+}
+
+
+/* =====================================================================
+   6) RENDERIZAÇÃO — LISTAGEM DE MODELOS DE UMA MARCA
+   ===================================================================== */
+
+function renderBrand(brandSlug) {
+  const brand = DATABASE[brandSlug];
+  if (!brand) { renderHome(); return; }
+
+  const modelCards = brand.models.map(model => {
+    const firstImage = (model.images || []).find(Boolean) || '';
+
+    return `
+    <button
+      class="group text-left border border-line-light dark:border-line-dark rounded-sm overflow-hidden hover:border-ink dark:hover:border-paper transition-colors"
+      data-action="open-product" data-brand="${brandSlug}" data-product="${model.id}"
+    >
+      ${mediaBox(
+        firstImage,
+        model.name,
+        photoPlaceholder(),
+        'aspect-square w-full bg-bone dark:bg-graphite',
+        IMG_PRODUCT_CARD
+      )}
+      <div class="p-4 sm:p-5 border-t border-line-light dark:border-line-dark">
+        <p class="font-display text-lg leading-snug">${model.name}</p>
+        <p class="font-mono text-xs text-stone mt-1.5 tracking-wide">${formatBRL(model.price)}</p>
+      </div>
+    </button>
+  `;
+  }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="view-fade">
+      <nav class="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-stone mb-6">
+        <button data-action="go-home" class="hover:text-ink dark:hover:text-paper transition-colors">RM Store</button>
+        <span>/</span>
+        <span class="text-ink dark:text-paper">${brand.name}</span>
+      </nav>
+
+      <button data-action="go-home" class="inline-flex items-center gap-1.5 text-sm font-mono uppercase tracking-widest text-stone hover:text-ink dark:hover:text-paper mb-8 transition-colors">
+        ${chevronLeftIcon()} Voltar
+      </button>
+
+      <div class="flex items-center gap-5 mb-8 sm:mb-10">
+        ${mediaBox(
+          brand.logoUrl,
+          `Logo ${brand.name}`,
+          logoPlaceholder(brand.name),
+          `h-14 sm:h-16 w-32 sm:w-40 shrink-0 ${LOGO_CHIP}`,
+          IMG_LOGO_HEADER
+        )}
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-stone">${brand.name}</p>
+          <p class="font-mono text-[11px] text-stone/70 mt-1">${brand.models.length} modelos disponíveis</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        ${modelCards}
+      </div>
+    </div>
+  `;
+
+  attachActionListeners();
+  bindMediaFallbacks();
+}
+
+
+/* =====================================================================
+   7) RENDERIZAÇÃO — DETALHE DO PRODUTO + TRIAGEM
+   ===================================================================== */
+
+function renderProduct(brandSlug, productId) {
+  const brand = DATABASE[brandSlug];
+  const model = brand ? brand.models.find(m => m.id === productId) : null;
+  if (!brand || !model) { renderHome(); return; }
+
+  // Por padrão, considera a primeira cor e o primeiro tamanho já
+  // selecionados, para que o botão do WhatsApp funcione imediatamente
+  // — conforme a regra: "ou por padrão considerar" uma cor e um tamanho.
+  state.selectedColor = model.colors[0];
+  state.selectedSize = model.sizes[0];
+
+  // Só considera fotos válidas (ignora strings vazias dentro de "images")
+  const validImages = (model.images || []).filter(Boolean);
+  const mainImage = validImages[0] || '';
+
+  const colorButtons = model.colors.map(color => `
+    <button
+      class="color-option px-4 py-2 border rounded-full text-sm transition-colors border-line-light dark:border-line-dark hover:border-ink dark:hover:border-paper"
+      data-color="${color}" aria-pressed="false"
+    >${color}</button>
+  `).join('');
+
+  const sizeButtons = model.sizes.map(size => `
+    <button
+      class="size-option w-12 h-12 border rounded-sm text-sm font-mono transition-colors border-line-light dark:border-line-dark hover:border-ink dark:hover:border-paper"
+      data-size="${size}" aria-pressed="false"
+    >${size}</button>
+  `).join('');
+
+  // Miniaturas só aparecem quando há mais de uma foto válida
+  const thumbButtons = validImages.length > 1
+    ? `
+      <div id="gallery-thumbs" class="flex flex-wrap gap-3 mt-4">
+        ${validImages.map((img, i) => `
+          <button
+            class="thumb-option w-16 h-16 sm:w-20 sm:h-20 border rounded-sm overflow-hidden bg-bone dark:bg-graphite ${i === 0 ? 'border-ink dark:border-paper' : 'border-line-light dark:border-line-dark'}"
+            data-index="${i}" data-url="${img}"
+            aria-label="Ver foto — ângulo ${i + 1}"
+          >
+            ${mediaContent(img, `${model.name} — ângulo ${i + 1}`, photoPlaceholder(), IMG_GALLERY_THUMB)}
+          </button>
+        `).join('')}
+      </div>`
+    : '';
+
+  document.getElementById('app').innerHTML = `
+    <div class="view-fade">
+      <nav class="flex flex-wrap items-center gap-2 font-mono text-xs uppercase tracking-widest text-stone mb-6">
+        <button data-action="go-home" class="hover:text-ink dark:hover:text-paper transition-colors">RM Store</button>
+        <span>/</span>
+        <button data-action="open-brand" data-brand="${brandSlug}" class="hover:text-ink dark:hover:text-paper transition-colors">${brand.name}</button>
+        <span>/</span>
+        <span class="text-ink dark:text-paper">${model.name}</span>
+      </nav>
+
+      <button data-action="open-brand" data-brand="${brandSlug}" class="inline-flex items-center gap-1.5 text-sm font-mono uppercase tracking-widest text-stone hover:text-ink dark:hover:text-paper mb-8 transition-colors">
+        ${chevronLeftIcon()} Voltar para ${brand.name}
+      </button>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+
+        <!-- Galeria de imagens -->
+        <div class="lg:sticky lg:top-24 self-start">
+          <div id="gallery-main" class="relative flex items-center justify-center overflow-hidden aspect-[4/3] w-full bg-bone dark:bg-graphite border border-line-light dark:border-line-dark rounded-sm">
+            ${mediaContent(mainImage, model.name, photoPlaceholder(), IMG_GALLERY_MAIN)}
+          </div>
+          ${thumbButtons}
+        </div>
+
+        <!-- Informações e triagem -->
+        <div>
+          <p class="font-mono text-xs uppercase tracking-[0.3em] text-stone mb-2">${brand.name}</p>
+          <h1 class="font-display text-3xl sm:text-4xl mb-3 leading-tight">${model.name}</h1>
+          <p class="font-mono text-xl text-accent dark:text-accent-dark mb-8">${formatBRL(model.price)}</p>
+
+          <div class="perforation"></div>
+
+          <!-- Seletor de cor -->
+          <div class="py-6">
+            <p class="font-mono text-xs uppercase tracking-widest text-stone mb-3">Cor</p>
+            <div id="color-options" class="flex flex-wrap gap-2.5">${colorButtons}</div>
+          </div>
+
+          <!-- Seletor de tamanho -->
+          <div class="pb-6">
+            <p class="font-mono text-xs uppercase tracking-widest text-stone mb-3">Tamanho</p>
+            <div id="size-options" class="flex flex-wrap gap-2.5">${sizeButtons}</div>
+          </div>
+
+          <div class="perforation"></div>
+
+          <!-- Aviso de triagem -->
+          <div class="my-6 border border-line-light dark:border-line-dark rounded-sm px-4 py-4">
+            <p class="font-mono text-[11px] uppercase tracking-widest text-stone mb-2">Nota</p>
+            <p class="text-sm text-stone leading-relaxed italic">
+              Este catálogo é uma ferramenta de triagem para facilitar o atendimento.
+              A confirmação de disponibilidade, numeração e cor é feita diretamente com a nossa equipe.
+            </p>
+          </div>
+
+          <!-- Prévia da mensagem que será enviada -->
+          <div class="mb-6 border border-line-light dark:border-line-dark rounded-sm px-4 py-3 bg-ink/[0.02] dark:bg-paper/[0.03]">
+            <p class="font-mono text-[11px] uppercase tracking-widest text-stone mb-2">Mensagem a ser enviada</p>
+            <p id="message-preview" class="font-mono text-xs leading-relaxed text-ink dark:text-paper"></p>
+          </div>
+
+          <!-- CTA: WhatsApp -->
+          <a
+            id="whatsapp-cta"
+            href="#" target="_blank" rel="noopener noreferrer"
+            class="flex items-center justify-center gap-2.5 w-full py-4 rounded-sm font-mono text-sm uppercase tracking-widest bg-ink text-bone dark:bg-paper dark:text-graphite hover:opacity-90 transition-opacity"
+          >
+            ${chatIcon()} Conversar no WhatsApp
+          </a>
+
+          <div class="barcode text-stone mt-8"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachActionListeners();
+  setupProductSelectors(model);
+  setupGallery(model);
+  bindMediaFallbacks();
+}
+
+// Configura a interatividade dos seletores de cor/tamanho e mantém o
+// botão do WhatsApp sempre sincronizado com a seleção atual.
+function setupProductSelectors(model) {
+  const colorButtons = document.querySelectorAll('#color-options .color-option');
+  const sizeButtons = document.querySelectorAll('#size-options .size-option');
+
+  function updateActiveStyles(buttons, selectedValue, datasetKey) {
+    buttons.forEach(btn => {
+      const isActive = btn.dataset[datasetKey] === String(selectedValue);
+      btn.setAttribute('aria-pressed', String(isActive));
+      btn.classList.toggle('bg-ink', isActive);
+      btn.classList.toggle('text-bone', isActive);
+      btn.classList.toggle('border-ink', isActive);
+      btn.classList.toggle('dark:bg-paper', isActive);
+      btn.classList.toggle('dark:text-graphite', isActive);
+      btn.classList.toggle('dark:border-paper', isActive);
+    });
+  }
+
+  function updateCta() {
+    const link = document.getElementById('whatsapp-cta');
+    const preview = document.getElementById('message-preview');
+    const hasSelection = Boolean(state.selectedColor) && Boolean(state.selectedSize);
+
+    const message = `Olá! Tenho interesse no tênis ${model.name}, cor ${state.selectedColor}, tamanho ${state.selectedSize}. Tem disponível?`;
+    preview.textContent = message;
+
+    if (hasSelection) {
+      link.href = buildWhatsAppLink(model.name, state.selectedColor, state.selectedSize);
+      link.classList.remove('opacity-40', 'pointer-events-none');
+    } else {
+      // Regra de negócio: o botão só funciona com cor E tamanho definidos.
+      link.href = '#';
+      link.classList.add('opacity-40', 'pointer-events-none');
+    }
+  }
+
+  colorButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.selectedColor = btn.dataset.color;
+      updateActiveStyles(colorButtons, state.selectedColor, 'color');
+      updateCta();
+    });
+  });
+
+  sizeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.selectedSize = Number(btn.dataset.size);
+      updateActiveStyles(sizeButtons, state.selectedSize, 'size');
+      updateCta();
+    });
+  });
+
+  // Aplica o estado inicial (primeira cor e primeiro tamanho já selecionados)
+  updateActiveStyles(colorButtons, state.selectedColor, 'color');
+  updateActiveStyles(sizeButtons, state.selectedSize, 'size');
+  updateCta();
+}
+
+// Configura a galeria: clicar numa miniatura troca a foto principal
+function setupGallery(model) {
+  const thumbButtons = document.querySelectorAll('#gallery-thumbs .thumb-option');
+  if (!thumbButtons.length) return;
+
+  thumbButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const url = btn.dataset.url;
+      const index = Number(btn.dataset.index);
+      const galleryMain = document.getElementById('gallery-main');
+
+      galleryMain.innerHTML = mediaContent(
+        url, `${model.name} — ângulo ${index + 1}`, photoPlaceholder(), IMG_GALLERY_MAIN
+      );
+      bindMediaFallbacks(galleryMain); // religa o fallback para a nova <img>
+
+      thumbButtons.forEach(b => {
+        const isActive = b === btn;
+        b.classList.toggle('border-ink', isActive);
+        b.classList.toggle('dark:border-paper', isActive);
+        b.classList.toggle('border-line-light', !isActive);
+        b.classList.toggle('dark:border-line-dark', !isActive);
+      });
+    });
+  });
+}
+
+
+/* =====================================================================
+   8) NAVEGAÇÃO
+   ===================================================================== */
+
+function goHome() {
+  state.screen = 'home';
+  state.brandSlug = null;
+  state.productId = null;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  renderHome();
+}
+
+function openBrand(brandSlug) {
+  state.screen = 'brand';
+  state.brandSlug = brandSlug;
+  state.productId = null;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  renderBrand(brandSlug);
+}
+
+function openProduct(brandSlug, productId) {
+  state.screen = 'product';
+  state.brandSlug = brandSlug;
+  state.productId = productId;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  renderProduct(brandSlug, productId);
+}
+
+// Delegação de eventos: qualquer elemento com data-action é tratado aqui.
+// Isso evita reanexar listeners manualmente após cada re-renderização.
+function attachActionListeners() {
+  document.querySelectorAll('[data-action]').forEach(el => {
+    el.addEventListener('click', () => {
+      const action = el.dataset.action;
+      if (action === 'go-home') goHome();
+      if (action === 'open-brand') openBrand(el.dataset.brand);
+      if (action === 'open-product') openProduct(el.dataset.brand, el.dataset.product);
+    });
+  });
+}
+
+
+/* =====================================================================
+   9) MODO ESCURO / CLARO
+   ===================================================================== */
+
+function applyInitialTheme() {
+  // Usa a preferência do sistema operacional como estado inicial.
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.classList.toggle('dark', prefersDark);
+}
+
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark');
+}
+
+document.getElementById('btn-theme-toggle').addEventListener('click', toggleTheme);
+document.getElementById('btn-logo').addEventListener('click', goHome);
+
+
+/* =====================================================================
+   10) INICIALIZAÇÃO
+   ===================================================================== */
+
+applyInitialTheme();
+renderHome();
+</script>
+</body>
+</html>
